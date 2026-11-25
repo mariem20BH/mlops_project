@@ -94,6 +94,19 @@ def evaluate_task(model, X_test, y_test):
     return evaluate_model(model, X_test, y_test)
 
 
+REPO_URL = "https://github.com/mariem20BH/mlops_project.git"
+
+
+@task(name="Récupérer le projet (git)")
+def clone_repo():
+    import os
+
+    if os.path.isdir("repo_clone/.git"):
+        run_cmd(["git", "-C", "repo_clone", "pull"])
+    else:
+        run_cmd(["git", "clone", REPO_URL, "repo_clone"])
+
+
 # ---------------- FLOWS ----------------
 @flow(name="install")
 def install_flow():
@@ -125,7 +138,7 @@ def evaluate_flow(data_path=DATA, target=TARGET, model_path=MODEL_PATH):
 
 @flow(name="all")
 def all_flow(data_path=DATA, target=TARGET, model_path=MODEL_PATH):
-    # Étapes liées au code, avant la préparation des données
+    clone_repo()
     install_dependencies()
     format_code()
     check_quality()
